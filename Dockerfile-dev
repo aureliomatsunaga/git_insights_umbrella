@@ -1,0 +1,23 @@
+FROM bitwalker/alpine-elixir-phoenix:latest
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV MIX_ENV dev
+
+RUN mkdir -p /umbrella
+COPY . /umbrella
+WORKDIR /umbrella
+
+RUN mix deps.get
+
+RUN cd apps/git_insights_web/assets && \
+  npm install --silent
+
+RUN cd apps/git_insights_web/assets && \
+  npm audit fix
+
+RUN mix phx.digest
+
+EXPOSE 4000
+EXPOSE 4002
+
+CMD ["mix", "phx.server"]
